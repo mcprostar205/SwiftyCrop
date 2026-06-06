@@ -46,16 +46,60 @@ struct CropView: View {
   
   // MARK: - Body
   var body: some View {
-#if compiler(>=6.2) // Use this to prevent compiling of unavailable iOS 26 / macOS 26 APIs
-    if configuration.usesLiquidGlassDesign,
-       #available(iOS 26, visionOS 26.0, macOS 26.0, *) {
-      buildLiquidGlassBody(configuration: configuration)
+    if configuration.embeddedCropView == true {
+        ZStack(alignment: .bottom) {
+          cropImageView
+            .task(id: viewModel.scale) {
+                // debounce: wait for 100 millisecnds before cropping next gesture
+                do {
+                    try await Task.sleep(for: .milliseconds(100))
+                    await MainActor.run {
+                        isCropping = true
+                    }
+                    let result = cropImage()
+                    await MainActor.run {
+                        onComplete(result)
+                        isCropping = false
+                    }
+                } catch {
+                    return
+                }
+            }
+            .task(id: viewModel.offset) {
+                // debounce: wait for 100 millisecnds before cropping next gesture
+                do {
+                    try await Task.sleep(for: .milliseconds(100))
+                    await MainActor.run {
+                        isCropping = true
+                    }
+                    let result = cropImage()
+                    await MainActor.run {
+                        onComplete(result)
+                        isCropping = false
+                    }
+                } catch {
+                    return
+                }
+            }
+            if configuration.zoomSlider == true {
+                let maxScaleValues = viewModel.calculateMagnificationGestureMaxValues()
+                Slider(value: $viewModel.scale, in: 0.1...maxScaleValues.1, step: 0.01)
+                    .tint(.accentColor)
+                    .frame(maxWidth: viewModel.maskSize.width - 16)
+            }
+        }
     } else {
-      buildLegacyBody(configuration: configuration)
-    }
+#if compiler(>=6.2) // Use this to prevent compiling of unavailable iOS 26 / macOS 26 APIs
+      if configuration.usesLiquidGlassDesign,
+        #available(iOS 26, visionOS 26.0, macOS 26.0, *) {
+          buildLiquidGlassBody(configuration: configuration)
+      } else {
+        buildLegacyBody(configuration: configuration)
+      }
 #else
-    buildLegacyBody(configuration: configuration)
+      buildLegacyBody(configuration: configuration)
 #endif
+    }
   }
 
   @available(iOS 26, visionOS 26.0, macOS 26.0, *)
@@ -161,6 +205,19 @@ struct CropView: View {
       }
   }
   
+  private var onTapMagnificationGesture: some Gesture {
+    TapGesture()
+      .onEnded { _ in
+          let sensitivity: CGFloat = 0.1 * configuration.zoomSensitivity
+          let scaledValue = sensitivity + 1
+          let maxScaleValues = viewModel.calculateMagnificationGestureMaxValues()
+          viewModel.scale = min(max(scaledValue * viewModel.lastScale, maxScaleValues.0), maxScaleValues.1)
+          updateOffset()
+          viewModel.lastScale = viewModel.scale
+          viewModel.lastOffset = viewModel.offset
+      }
+  }
+    
   private var dragGesture: some Gesture {
     DragGesture()
       .onChanged { value in
@@ -263,6 +320,7 @@ struct CropView: View {
     .simultaneousGesture(magnificationGesture)
     .simultaneousGesture(dragGesture)
     .simultaneousGesture(configuration.rotateImage ? rotationGesture : nil)
+    //.simultaneousGesture(onTapMagnificationGesture)
   }
 
   private var maskHandlesOverlay: some View {

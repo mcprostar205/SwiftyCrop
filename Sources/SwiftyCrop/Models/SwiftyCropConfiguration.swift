@@ -3,6 +3,7 @@ import SwiftUI
 
 /// `SwiftyCropConfiguration` is a struct that defines the configuration for cropping behavior and the UI.
 public struct SwiftyCropConfiguration {
+  public let embeddedCropView: Bool
   public let maxMagnificationScale: CGFloat
   public let maskRadius: CGFloat
   public let cropImageCircular: Bool
@@ -10,6 +11,7 @@ public struct SwiftyCropConfiguration {
   public let rotateImageWithButtons: Bool
   public let usesLiquidGlassDesign: Bool
   public let zoomSensitivity: CGFloat
+  public let zoomSlider: Bool
   public let rectAspectRatio: CGFloat
   public let allowAspectRatioResizing: Bool
   public let minAspectRatio: CGFloat
@@ -155,6 +157,7 @@ public struct SwiftyCropConfiguration {
   ///
   ///   - colors: `Colors` object when using custom colors for the cropping view.
   public init(
+    embeddedCropView: Bool = false,
     maxMagnificationScale: CGFloat = 4.0,
     maskRadius: CGFloat = 130,
     cropImageCircular: Bool = false,
@@ -162,6 +165,7 @@ public struct SwiftyCropConfiguration {
     rotateImageWithButtons: Bool = false,
     usesLiquidGlassDesign: Bool? = nil,
     zoomSensitivity: CGFloat = 1,
+    zoomSlider: Bool = false,
     rectAspectRatio: CGFloat = 4/3,
     allowAspectRatioResizing: Bool = false,
     minAspectRatio: CGFloat = 0.1,
@@ -170,12 +174,14 @@ public struct SwiftyCropConfiguration {
     fonts: Fonts = Fonts(),
     colors: Colors = Colors()
   ) {
+    self.embeddedCropView = embeddedCropView
     self.maxMagnificationScale = maxMagnificationScale
     self.maskRadius = maskRadius
     self.cropImageCircular = cropImageCircular
     self.rotateImage = rotateImage
     self.rotateImageWithButtons = rotateImageWithButtons
     self.zoomSensitivity = zoomSensitivity
+    self.zoomSlider = zoomSlider
     self.rectAspectRatio = rectAspectRatio
     self.allowAspectRatioResizing = allowAspectRatioResizing
     self.minAspectRatio = minAspectRatio
