@@ -283,7 +283,7 @@ struct CropView: View {
         .rotationEffect(viewModel.angle)
         .scaleEffect(viewModel.scale)
         .offset(viewModel.offset)
-        .opacity(0.5)
+        .opacity(configuration.maskOpacity)
         .overlay(
           GeometryReader { geometry in
             Color.clear

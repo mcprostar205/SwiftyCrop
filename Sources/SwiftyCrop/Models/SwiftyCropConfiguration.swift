@@ -6,6 +6,7 @@ public struct SwiftyCropConfiguration {
   public let embeddedCropView: Bool
   public let maxMagnificationScale: CGFloat
   public let maskRadius: CGFloat
+  public let maskOpacity: CGFloat
   public let cropImageCircular: Bool
   public let rotateImage: Bool
   public let rotateImageWithButtons: Bool
@@ -160,6 +161,7 @@ public struct SwiftyCropConfiguration {
     embeddedCropView: Bool = false,
     maxMagnificationScale: CGFloat = 4.0,
     maskRadius: CGFloat = 130,
+    maskOpacity: CGFloat = 0.5,
     cropImageCircular: Bool = false,
     rotateImage: Bool = false,
     rotateImageWithButtons: Bool = false,
@@ -177,6 +179,7 @@ public struct SwiftyCropConfiguration {
     self.embeddedCropView = embeddedCropView
     self.maxMagnificationScale = maxMagnificationScale
     self.maskRadius = maskRadius
+    self.maskOpacity = maskOpacity
     self.cropImageCircular = cropImageCircular
     self.rotateImage = rotateImage
     self.rotateImageWithButtons = rotateImageWithButtons
